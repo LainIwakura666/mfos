@@ -1,7 +1,7 @@
 #include "gdt.h"
 #include <stdint.h>
 
-#define GDT_ENTRIES 3
+#define GDT_ENTRIES 5
 
 struct gdt_entry gdt_entries[GDT_ENTRIES];
 struct gdt_ptr gdt_ptr;
@@ -31,4 +31,14 @@ void init_gdt() {
     gdt_set_entry(2, 0, 0xFFFFF,
                   0x92,
                   0xCF);
+
+    gdt_set_entry(3, 0, 0xFFFFF,
+                  0xFA,
+                  0xCF);
+
+    gdt_set_entry(4, 0, 0xFFFFF,
+                  0xF2,
+                  0xCF);
+
+    gdt_flush();
 }

@@ -16,7 +16,7 @@ stack_top:
 .section .text
 .global _start
 _start:
-	movl $stack_top, %esp
+	mov $stack_top, %esp
 	call kernel_main
 	cli
 1:	hlt
