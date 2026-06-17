@@ -1,12 +1,12 @@
 #include "gdt.h"
 #include <stdint.h>
 
-#define GDT_ENTRIES 5
+#define GDT_ENTRIES 6
 
 struct gdt_entry gdt_entries[GDT_ENTRIES];
 struct gdt_ptr gdt_ptr;
 
-static void gdt_set_entry(int num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran) {
+void gdt_set_entry(int num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran) {
     gdt_entries[num].base_low = (base & 0xFFFF);
     gdt_entries[num].base_middle = (base >> 16) & 0xFF;
     gdt_entries[num].base_high = (base >> 24) & 0xFF;

@@ -4,15 +4,20 @@ enter_user_mode:
     mov 4(%esp), %eax
     mov 8(%esp), %edx
 
-    movw $0x23, %ax
-    mov %ax, %ds
-    mov %ax, %es
-    mov %ax, %fs
-    mov %ax, %gs
+    mov $0x23, %ecx
+    movw %cx, %ds
+    movw %cx, %es
+    movw %cx, %fs
+    movw %cx, %gs
+
+    pushfl
+    pop %ecx
+    orl $0x3000, %ecx
+    push %ecx
 
     pushl $0x23
     push %edx
-    pushfl
+    push %ecx
     pushl $0x1B
     push %eax
 

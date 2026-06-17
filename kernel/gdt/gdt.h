@@ -25,5 +25,6 @@ struct gdt_ptr {
 void init_gdt();
 
 extern void gdt_flush();
+void gdt_set_entry(int num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran);
 
 #endif

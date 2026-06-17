@@ -23,24 +23,29 @@ static inline void insw(uint16_t port, void *addr, int cnt) {
 }
 
 int ata_read_sectors(uint32_t lba, uint8_t count, void *buffer) {
+    int timeout = 100000;
+    uint8_t status;
 
-    while (inb(ATA_STATUS) & 0x80);
+    do {
+        status = inb(ATA_STATUS);
+        if (--timeout == 0) return -1;
+    } while ((status & 0x80) || !(status & 0x40));
 
-   // outb(ATA_DRIVE, 0xE0 | ((lba >> 24) & 0x0F));
-    outb(ATA_DRIVE, 0xE0 | ((lba >> 24) & 0x0F) | 0x02);
-    outb(ATA_SECTORS, count);
+        outb(ATA_DRIVE, 0xE0 | ((lba >> 24) & 0x0F));
+        for (int i = 0; i < 4; i++) inb(ATA_STATUS);
+
+        outb(ATA_SECTORS, count);
     outb(ATA_LBA_LOW, lba & 0xFF);
     outb(ATA_LBA_MID, (lba >> 8) & 0xFF);
     outb(ATA_LBA_HIGH, (lba >> 16) & 0xFF);
-
-    outb(ATA_COMMAND, 0x20);
+    outb(ATA_COMMAND, 0x20); // READ SECTORS
 
     for (int i = 0; i < count; i++) {
         while (1) {
-            uint8_t status = inb(ATA_STATUS);
+            status = inb(ATA_STATUS);
+            if (status & 0x01) return -2;
             if (!(status & 0x80) && (status & 0x08)) break;
         }
-
         insw(ATA_DATA, buffer, 256);
         buffer = (uint8_t *)buffer + 512;
     }
