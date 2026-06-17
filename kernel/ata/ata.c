@@ -26,7 +26,8 @@ int ata_read_sectors(uint32_t lba, uint8_t count, void *buffer) {
 
     while (inb(ATA_STATUS) & 0x80);
 
-    outb(ATA_DRIVE, 0xE0 | ((lba >> 24) & 0x0F));
+   // outb(ATA_DRIVE, 0xE0 | ((lba >> 24) & 0x0F));
+    outb(ATA_DRIVE, 0xE0 | ((lba >> 24) & 0x0F) | 0x02);
     outb(ATA_SECTORS, count);
     outb(ATA_LBA_LOW, lba & 0xFF);
     outb(ATA_LBA_MID, (lba >> 8) & 0xFF);

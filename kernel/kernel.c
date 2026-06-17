@@ -14,3 +14,4 @@ void kernel_main(void) {
         asm volatile("hlt");
     }
 }
+

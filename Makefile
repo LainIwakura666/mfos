@@ -5,19 +5,20 @@ LD = i686-elf-ld
 OBJCOPY = i686-elf-objcopy
 
 ASFLAGS = --32
-CFLAGS = -m32 -ffreestanding -nostdlib -nostdinc -fno-stack-protector -fno-pic -O2 -Wall -Wextra
+CFLAGS = -m32 -ffreestanding -nostdlib -fno-stack-protector -fno-pic -O2 -Wall -Wextra
 LDFLAGS = -m elf_i386 -T kernel/linker.ld -nostdlib
 
-INCLUDES = -Ikernel -Ikernel/gdt -Ikernel/idt -Ikernel/paging -Ikernel/ata -Ikernel/load_user
+INCLUDES = -Ikernel -Ikernel/gdt -Ikernel/idt -Ikernel/paging -Ikernel/ata -Ikernel/load_user -Ikernel/lib
 
 KERNEL_C = kernel/kernel.c kernel/gdt/gdt.c kernel/idt/idt.c \
-           kernel/paging/paging.c kernel/ata/ata.c kernel/load_user/load_user.c
-KERNEL_S = kernel/boot.S kernel/gdt/gdt.S kernel/idt/isr.S \
-           kernel/paging/paging.S kernel/load_user/load_user.S
+           kernel/paging/paging.c kernel/ata/ata.c \
+           kernel/load_user/load_user.c kernel/lib/string.c
+KERNEL_S = kernel/boot.s kernel/gdt/gdt_flush.s kernel/idt/isr.s \
+           kernel/paging/enable_paging.s kernel/load_user/enter_user.s
 
-KERNEL_OBJ = $(KERNEL_C:.c=.o) $(KERNEL_S:.S=.o)
+KERNEL_OBJ = $(KERNEL_C:.c=.o) $(KERNEL_S:.s=.o)
 
-USER_ASM = test/userprog.S
+USER_ASM = test/userprog.s
 USER_BIN = test/userprog.bin
 
 KERNEL_ELF = kernel/kernel.elf
@@ -27,14 +28,14 @@ ISO_DIR = isodir
 
 all: $(OS_ISO) $(PROG_IMG)
 
-%.o: %.S
+%.o: %.s
 	$(AS) $(ASFLAGS) $< -o $@
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 $(KERNEL_ELF): $(KERNEL_OBJ)
-	$(LD) $(LDFLAGS) -o $@ $^ -lgcc
+	$(LD) $(LDFLAGS) -o $@ $^
 
 $(USER_BIN): $(USER_ASM)
 	$(AS) $(ASFLAGS) $< -o test/userprog.o
